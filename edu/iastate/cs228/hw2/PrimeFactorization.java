@@ -2,7 +2,7 @@ package edu.iastate.cs228.hw2;
 
 /**
  *  
- * @author
+ * @author Thomas Syvertsen
  *
  */
 
@@ -39,7 +39,8 @@ public class PrimeFactorization implements Iterable<PrimeFactor>
 	 */
 	public PrimeFactorization() 
 	{	 
-		// TODO 
+		value = 0;
+		
 	}
 
 	
@@ -435,7 +436,7 @@ public class PrimeFactorization implements Iterable<PrimeFactor>
 		 */
 		public Node()
 		{
-			// TODO 
+			pFactor = null;
 		}
 	    
 		/**
@@ -447,7 +448,8 @@ public class PrimeFactorization implements Iterable<PrimeFactor>
 		 */
 		public Node(int p, int m) throws IllegalArgumentException 
 		{	
-			// TODO 
+			pFactor.prime = p;
+			pFactor.multiplicity = m;
 		}   
 
 		
@@ -459,7 +461,8 @@ public class PrimeFactorization implements Iterable<PrimeFactor>
 		 */
 		public Node(PrimeFactor pf)  
 		{
-			// TODO 
+			pFactor.prime = pf.prime;
+			pFactor.multiplicity = pf.multiplicity;
 		}
 
 
@@ -471,8 +474,15 @@ public class PrimeFactorization implements Iterable<PrimeFactor>
 		@Override
 		public String toString() 
 		{
-			// TODO 
-			return null; 
+			String returnThis;
+			if (pFactor.multiplicity == 1) {
+				returnThis = (pFactor.prime + "");
+			} else if (pFactor != null) {
+				returnThis = (pFactor.prime + "^" + pFactor.multiplicity);
+			} else {
+				returnThis = ("dummy");
+			}
+			return returnThis; 
 		}
     }
 
