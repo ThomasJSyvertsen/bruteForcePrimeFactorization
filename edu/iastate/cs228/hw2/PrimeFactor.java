@@ -2,7 +2,7 @@ package edu.iastate.cs228.hw2;
 
 /**
  *  
- * @author
+ * @author Thomas Syvertsen
  *
  */
 
@@ -20,7 +20,12 @@ public class PrimeFactor
 	 */
 	public PrimeFactor(int p, int m) throws IllegalArgumentException
 	{
-		// TODO 
+		try {
+    		prime = p;
+    		multiplicity = m;
+		} catch (IllegalArgumentException e) {
+			System.out.print("Please Enter a Valid Input");
+		}
 	}
 
 	@Override
@@ -36,7 +41,10 @@ public class PrimeFactor
 	@Override
 	public String toString() 
 	{
-		// TODO 
-		return null; 
+		if (multiplicity == 1) {
+			return (prime + "");
+		} else {
+			return (prime + "^" + multiplicity);
+		}
 	}
 }
