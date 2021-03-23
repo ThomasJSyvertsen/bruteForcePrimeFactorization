@@ -7,6 +7,7 @@ package edu.iastate.cs228.hw2;
  */
 
 import java.util.ListIterator;
+import PrimeFactor;
 
 public class PrimeFactorization implements Iterable<PrimeFactor> {
 	private static final long OVERFLOW = -1;
@@ -44,21 +45,22 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 
 	}
 
-	/** 
-	 * Obtains the prime factorization of n and creates a doubly linked list to store the result.   
-	 * Follows the direct search factorization algorithm in Section 1.2 of the project description. 
+	/**
+	 * Obtains the prime factorization of n and creates a doubly linked list to
+	 * store the result. Follows the direct search factorization algorithm in
+	 * Section 1.2 of the project description.
 	 * 
 	 * @param n
 	 * @throws IllegalArgumentException if n < 1
 	 */
 	public PrimeFactorization(long n) throws IllegalArgumentException {
 		this();
-		
+
 		// Throw exception if factorization cannot be preformed on n.
 		if (n < 1) {
-			throw new IllegalArgumentException("Illegal Argument Exception Occurred");
+			throw new IllegalArgumentException("Illegal Argument Exception Occurred.");
 		}
-		
+
 		int m = n;
 		// Adds PrimeFactors to the PrimeFactorization object.
 		for (int i = 2; i * i < m && isPrime(i); i++) {
@@ -77,11 +79,10 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 	 */
 	public PrimeFactorization(PrimeFactorization pf) {
 		this();
-		
+
 		PrimeFactorizationIterator pfi = pf.iterator();
 		while (pfi.hasNext()) {
-			PrimeFactor p = pfi.next();
-			this.add(p.prime, p.multiplicity);
+			this.add(pfi.next());
 		}
 	}
 
@@ -92,7 +93,11 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 	 * @param pflist
 	 */
 	public PrimeFactorization(PrimeFactor[] pfList) {
-		// TODO
+		this();
+
+		for (int i = 0; i < pfList.length(); i++) {
+			this.add(pfList[i].prime, pfList[i].multiplicity);
+		}
 	}
 
 	// --------------
@@ -134,7 +139,7 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 	 * @throws IllegalArgumentException if n < 1
 	 */
 	public void multiply(long n) throws IllegalArgumentException {
-		PrimeFactorization pf = new PrimeFactorization(n);
+		// TODO
 	}
 
 	/**
@@ -491,26 +496,36 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 
 		@Override
 		public boolean hasNext() {
-			// TODO
-			return false;
+			if (cursor.next == tail) {
+				return false;
+			}
+			return true;
 		}
 
 		@Override
 		public boolean hasPrevious() {
-			// TODO
-			return false;
+			if (cursor.previous == head) {
+				return false;
+			}
+			return true;
 		}
 
 		@Override
 		public PrimeFactor next() {
-			// TODO
-			return null;
+			pending = cursor;
+			cursor.previous = pending;
+			cursor.next = pending.next;
+			index++;
+			return pending;
 		}
 
 		@Override
 		public PrimeFactor previous() {
-			// TODO
-			return null;
+			pending = cursor.previous;
+			cursor.previous = pending.previous;
+			cursor.next = pending;
+			index--;
+			return pending;
 		}
 
 		/**
@@ -520,7 +535,13 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 		 */
 		@Override
 		public void remove() throws IllegalStateException {
-			// TODO
+			if (pending == null) {
+				throw new IllegalStateException("Illegal State Exception Occurred.")
+			}
+			
+			pending.next.previous = pending.previous;
+			pending.previous.next = pending.next;
+			pending = null;
 		}
 
 		/**
@@ -539,7 +560,16 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 		 */
 		@Override
 		public void add(PrimeFactor pf) throws IllegalArgumentException {
-			// TODO
+			if ((pf.prime < cursor.previous.pFactor.prime && cursor.previous != head)
+					|| (pf.prime > cursor.pFactor.prime && cursor != tail)) {
+				throw new IllegalArgumentException("Illegal Argument Exception Occurred.");
+			} else if (pf.prime == cursor.pFactor.prime) {
+				cursor.pFactor.multiplicity += pf.multiplicity;
+			} else {
+				Node n = new Node(pf);
+				link(cursor.previous, n);
+				index++;
+			}
 		}
 
 		@Override
@@ -576,14 +606,18 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 	 * Precondition: current != null, toAdd != null
 	 */
 	private void link(Node current, Node toAdd) {
-		// TODO
+		toAdd.next = current.next;
+		toAdd.previous = current;
+		current.next.previous = toAdd;
+		current.next = toAdd;
 	}
 
 	/**
 	 * Removes toRemove from the list without updating size.
 	 */
 	private void unlink(Node toRemove) {
-		// TODO
+		toRemove.previous.next = toRemove.next;
+		toRemove.next.previous = toRemove.previous;
 	}
 
 	/**
@@ -592,7 +626,7 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 	 * Made public for testing purpose. Ought to be private otherwise.
 	 */
 	public void clearList() {
-		// TODO
+		this.head.next = tail;
 	}
 
 	/**
@@ -604,7 +638,16 @@ public class PrimeFactorization implements Iterable<PrimeFactor> {
 	 */
 	private void updateValue() {
 		try {
-			// TODO
+			PrimeFactorizationIterator pfi = this.iterator();
+			long value = 1;
+			while (pfi.hasNext()) {
+				int temp = 1;
+				Node n = pfi.next();
+				for (int i = n.pFactor.multiplicity; i >= 1; i--) {
+					temp = Math.multiplyExact(temp, n.pFactor.prime);
+				}
+				value = Math.multiplyExact(value, temp);
+			}
 		}
 
 		catch (ArithmeticException e) {
